@@ -7,6 +7,7 @@ from packaging import version
 from typing import Optional, Dict
 import zipfile
 import io
+import configparser
 
 
 def get_local_chromedriver_version(executable_path: str = "chromedriver") -> Optional[str]:
@@ -227,7 +228,83 @@ def copy_chromedriver(source_path: str, target_dir: str) -> bool:
         return False
 
 
+def load_config() -> configparser.ConfigParser:
+    """
+    加载配置文件，如果不存在则创建默认配置
+
+    Returns:
+        configparser.ConfigParser: 配置解析器对象
+    """
+    config = configparser.ConfigParser()
+    config_file = 'chromedriver_config.ini'
+
+    # 检查配置文件是否存在
+    if os.path.exists(config_file):
+        print(f"正在读取配置文件: {config_file}")
+        config.read(config_file, encoding='utf-8')
+    else:
+        print(f"配置文件不存在，将创建默认配置: {config_file}")
+        config['Settings'] = {
+            'target_directory': os.getcwd(),
+            'last_update': '',
+            'auto_update': 'False'
+        }
+
+        # 保存默认配置
+        with open(config_file, 'w', encoding='utf-8') as f:
+            config.write(f)
+
+    return config
+
+
+def save_config(config: configparser.ConfigParser, target_dir: str) -> bool:
+    """
+    保存配置到INI文件
+
+    Args:
+        config (configparser.ConfigParser): 配置解析器对象
+        target_dir (str): 目标目录路径
+
+    Returns:
+        bool: 保存成功返回True，否则返回False
+    """
+    try:
+        config_file = 'chromedriver_config.ini'
+
+        # 确保Settings部分存在
+        if 'Settings' not in config:
+            config['Settings'] = {}
+
+        # 更新配置
+        config['Settings']['target_directory'] = target_dir
+        config['Settings']['last_update'] = import_datetime().strftime('%Y-%m-%d %H:%M:%S')
+
+        # 保存配置
+        with open(config_file, 'w', encoding='utf-8') as f:
+            config.write(f)
+
+        print(f"已将目标目录保存到配置文件: {config_file}")
+        return True
+    except Exception as e:
+        print(f"保存配置失败: {e}")
+        return False
+
+
+def import_datetime():
+    """
+    导入datetime模块并返回当前时间
+
+    Returns:
+        datetime: 当前日期时间对象
+    """
+    from datetime import datetime
+    return datetime.now()
+
+
 if __name__ == "__main__":
+    # 加载配置
+    config = load_config()
+
     # 获取Chrome for Testing信息
     print("正在获取Chrome for Testing信息...")
     chrome_info = get_chrome_for_testing_info()
@@ -306,13 +383,16 @@ if __name__ == "__main__":
         choice = input().strip().lower()
 
         if choice == 'y' or choice == 'yes':
-            # 提示用户输入目标目录
-            print("\n请输入目标目录路径 (直接回车将使用当前目录):")
+            # 从配置文件获取上次使用的目录
+            default_dir = config['Settings'].get('target_directory', os.getcwd())
+
+            # 提示用户输入目标目录，并显示默认值
+            print(f"\n请输入目标目录路径 (直接回车将使用: {default_dir}):")
             target_dir = input().strip()
 
-            # 如果用户未输入，使用当前目录
+            # 如果用户未输入，使用默认目录
             if not target_dir:
-                target_dir = os.getcwd()
+                target_dir = default_dir
 
             # 确认目录
             print(f"\n您输入的目标目录是: {target_dir}")
@@ -323,6 +403,10 @@ if __name__ == "__main__":
                 # 执行复制
                 if copy_chromedriver(download_path, target_dir):
                     print(f"\n✅ ChromeDriver已成功复制到: {target_dir}")
+
+                    # 保存目录到配置文件
+                    save_config(config, target_dir)
+
                     print("如果需要，请将此目录添加到您的环境变量中。")
                 else:
                     print("\n❌ 复制失败，请手动复制chromedriver.exe到所需位置。")
