@@ -1,107 +1,109 @@
-# ChromeDriver 自动更新工具 (GUI版)
+# ChromeDriver 自动更新工具 (GUI)
 
-基于 PyQt6 的 ChromeDriver 版本管理工具，提供图形化界面进行版本检测、下载和更新。
+基于 PyQt6 的 ChromeDriver 版本检查与自动更新工具，专为 **Windows x64** 设计，采用暗色主题界面。
 
-## 功能特点
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078d4)
+![UI](https://img.shields.io/badge/UI-PyQt6%20Dark-1e1e2e)
 
-- **图形化界面** - 友好的 GUI 操作，告别命令行
-- **一键检查更新** - 自动检测本地版本并与官方 Stable 版本对比
-- **可视化下载** - 实时显示下载进度
-- **路径记忆** - 记住上次使用的目标路径
-- **操作日志** - 实时显示所有操作记录
-- **智能备份** - 复制时自动备份已存在的旧版本
-- **Windows 支持** - 专为 Windows x64 平台优化
+## 功能特性
 
-## 系统要求
+- **一键检查更新** — 自动对比本地 ChromeDriver 与官方最新 Stable 版本
+- **自动检测 Chrome** — 通过 Windows 注册表读取本地 Chrome 浏览器版本
+- **双通道获取版本** — 优先 JSON API，失败自动回退 HTML 解析，确保可靠性
+- **下载 & 解压** — 一键下载 win64 版本 ChromeDriver 并自动解压
+- **取消下载** — 下载过程中可随时取消
+- **复制安装** — 将下载的 ChromeDriver 复制到指定目录，自动备份旧版本
+- **路径记忆** — 目标目录自动保存到 `chromedriver_config.ini`
+- **操作日志** — 实时显示操作日志，支持导出为 `.txt` 文件
+- **暗色主题** — Catppuccin Mocha 配色风格，护眼舒适
+- **高 DPI 适配** — 支持高分屏显示
 
-- Python 3.8+
-- Windows 操作系统
-- 网络连接
+## 环境要求
+
+- Python 3.9+
+- Windows x64 操作系统
 
 ## 安装依赖
 
 ```bash
-pip install -r requirements.txt
+pip install PyQt6 requests beautifulsoup4 packaging
 ```
 
 ## 使用方法
 
 ```bash
-python chromedriver_checker.py
+python chromedriver_checker_gui.py
 ```
 
-## 界面说明
+### 操作流程
 
-### 版本信息区域
-- 显示本地 ChromeDriver 版本
-- 显示官方最新 Stable 版本
-- 显示当前状态（最新/需更新/未检测到）
+1. **启动程序** — 自动检测本地 Chrome 浏览器版本
+2. **点击「检查更新」** — 获取本地 ChromeDriver 版本并与官方最新版对比
+3. **点击「下载最新版本」** — 下载 ChromeDriver（仅在有新版本时可用）
+4. **设置目标路径** — 点击「浏览」选择 ChromeDriver 的安装目录
+5. **点击「复制到目标」** — 将下载的文件安装到目标目录（自动备份旧版本）
 
-### 操作按钮
-- **检查更新** - 检测本地版本并获取最新版本信息
-- **下载最新版本** - 下载最新 Stable 版本（检测到更新后可用）
+## 界面预览
 
-### 目标路径设置
-- 输入框显示当前目标路径
-- **浏览** - 打开目录选择对话框
-- **复制到目标** - 将下载的 ChromeDriver 复制到目标目录
+```
+┌─────────────────────────────────────────────────┐
+│  ChromeDriver 自动更新工具                        │
+├─────────────────────────────────────────────────┤
+│  ┌ 版本信息 ──────────────────────────────────┐  │
+│  │ Chrome 浏览器: 133.0.6943.54               │  │
+│  │ ChromeDriver 本地版本: 132.0.6834.83       │  │
+│  │ 官方最新版本: 133.0.6943.54                │  │
+│  │ 状态: ⬆️ 发现新版本可更新                    │  │
+│  └────────────────────────────────────────────┘  │
+│                                                   │
+│      [🔍 检查更新] [📥 下载最新版本] [⏹️ 取消]    │
+│                                                   │
+│  ┌ 目标路径 ──────────────────────────────────┐  │
+│  │ D:/Python/Scripts  [📁 浏览] [📋 复制到目标] │  │
+│  └────────────────────────────────────────────┘  │
+│                                                   │
+│  ████████████████████░░░░░░░░ 65%                 │
+│                                                   │
+│  ┌ 操作日志 ──────────────────────────────────┐  │
+│  │ [09:30:01] 🎯 工具已启动                    │  │
+│  │ [09:30:01] 🌐 检测到 Chrome 133.0.6943.54  │  │
+│  │ [09:30:05] ⬆️ 发现新版本，建议更新           │  │
+│  │                                              │  │
+│  │ [💾 导出日志] [🗑️ 清空日志]                  │  │
+│  └────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────┤
+│  就绪                                             │
+└─────────────────────────────────────────────────┘
+```
 
-### 进度条
-- 显示当前操作进度
+## 文件说明
 
-### 操作日志
-- 实时显示所有操作记录和状态信息
+| 文件 | 说明 |
+|------|------|
+| `chromedriver_checker_gui.py` | 主程序（GUI 界面） |
+| `chromedriver_config.ini` | 配置文件（目标路径、上次更新时间） |
+| `chromedriver/` | 下载的 ChromeDriver 解压目录 |
 
 ## 配置文件
 
-运行后自动生成 `chromedriver_config.ini`：
+程序会自动生成 `chromedriver_config.ini`：
 
 ```ini
 [Settings]
-target_directory = C:\your\path
-last_update = 2025-12-26 12:00:00
+target_directory = D:/Python/Python314/Scripts
+last_update = 2026-02-06 09:34:38
 auto_update = False
 ```
 
-## 目录结构
+## 技术细节
 
-```
-.
-├── chromedriver_checker.py     # 主程序
-├── requirements.txt            # 依赖列表
-├── chromedriver_config.ini     # 配置文件（首次运行后生成）
-├── chromedriver/               # 下载目录（自动创建）
-│   └── chromedriver-win64/
-│       └── chromedriver.exe
-└── README.md
-```
+- **版本数据源**：[Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/) 官方接口
+- **双通道策略**：优先请求 JSON API（结构化数据），网络异常时自动回退 HTML 页面解析
+- **后台线程**：所有网络请求和文件操作在 `QThread` 中执行，不阻塞 UI
+- **版本备份**：复制前自动将旧的 `chromedriver.exe` 备份为 `.bak` 文件
+- **Chrome 版本检测**：优先读取 Windows 注册表 `HKCU\SOFTWARE\Google\Chrome\BLBeacon`，备用 `wmic` 命令
 
-## 常见问题
+## 许可证
 
-### Q: 检查更新时提示无法获取版本信息？
-
-检查网络连接，确认可以访问 Google 相关网站。
-
-### Q: 下载速度慢？
-
-下载文件托管在 Google 服务器上，受网络环境影响。
-
-### Q: 如何添加到系统 PATH？
-
-1. 右键"此电脑" → 属性 → 高级系统设置
-2. 环境变量 → 系统变量 → Path
-3. 新建 → 输入 ChromeDriver 所在目录
-4. 确定保存
-
-## 技术栈
-
-- **PyQt6** - GUI 框架
-- **requests** - HTTP 请求
-- **BeautifulSoup4** - HTML 解析
-- **packaging** - 版本号比较
-
-## 相关链接
-
-- [Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/)
-- [ChromeDriver 文档](https://chromedriver.chromium.org/)
-- [Selenium 文档](https://www.selenium.dev/documentation/)
+MIT License
