@@ -14,7 +14,7 @@ Features:
     - DPI 高分屏适配
 
 Usage:
-    python chromedriver_checker_gui.py
+    python chromedriver_checker.py
 """
 
 import sys
