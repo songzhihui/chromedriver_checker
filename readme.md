@@ -33,7 +33,7 @@ pip install PyQt6 requests beautifulsoup4 packaging
 ## 使用方法
 
 ```bash
-python chromedriver_checker_gui.py
+python chromedriver_checker.py
 ```
 
 ### 操作流程
@@ -81,9 +81,10 @@ python chromedriver_checker_gui.py
 
 | 文件 | 说明 |
 |------|------|
-| `chromedriver_checker_gui.py` | 主程序（GUI 界面） |
+| `chromedriver_checker.py` | 主程序（GUI 界面） |
 | `chromedriver_config.ini` | 配置文件（目标路径、上次更新时间） |
 | `chromedriver/` | 下载的 ChromeDriver 解压目录 |
+| `requirements.txt` | 依赖库列表 |
 
 ## 配置文件
 
